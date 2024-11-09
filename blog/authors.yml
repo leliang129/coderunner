@@ -1,13 +1,5 @@
 1cobot:
   name: 1cobot
-  title: Website owner
-  url: https://1cobot.com
-  image_url: https://img.aigexing.com/uploads/8/1253/2765577073/9987324903/589745510.jpg
-  page:
-    # customize the url of the author page at /blog/authors/<permalink>
-    permalink: '/all-sebastien-lorber-articles'
-  # socials:
-  #   x: sebastienlorber
-  #   linkedin: sebastienlorber
-  #   github: slorber
-  #   newsletter: https://thisweekinreact.com
+  title: 开发者
+  url: https://github.com/leliang129
+  image_url: https://github.com/leliang129.png
