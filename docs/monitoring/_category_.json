@@ -1,0 +1,8 @@
+{
+  "label": "Prometheus",
+  "position": 2,
+  "link": {
+    "type": "generated-index",
+    "description": "Prometheus 监控系统相关文档"
+  }
+} 

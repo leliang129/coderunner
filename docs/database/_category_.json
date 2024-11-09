@@ -1,0 +1,8 @@
+{
+  "label": "Database",
+  "position": 3,
+  "link": {
+    "type": "generated-index",
+    "description": "数据库相关文档，包括 MySQL、PostgreSQL、MongoDB、Redis 等"
+  }
+} 
