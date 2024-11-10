@@ -4,6 +4,8 @@ description: 使用kubeadm + containerd部署k8s高可用集群
 keywords: [containerd, docker, k8s,sealos]
 sidebar_position: 3
 ---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 ## Sealos 简介
 Sealos 是一款以 Kubernetes 为内核的云操作系统发行版。它以云原生的方式，抛弃了传统的云计算架构，转向以 Kubernetes 为云内核的新架构，使企业能够像使用个人电脑一样简单地使用云。    
@@ -88,18 +90,20 @@ SealosVersion:
   platform: linux/amd64
 ```
 以及**二进制手动下载**：
-:::info[amd64下载]
-```shell
+<Tabs>
+  <TabItem value="amd64下载" label="amd64下载">
+  ```shell
 wget https://mirror.ghproxy.com/https://github.com/labring/sealos/releases/download/${VERSION}/sealos_${VERSION#v}_linux_amd64.tar.gz \
   && tar zxvf sealos_${VERSION#v}_linux_amd64.tar.gz sealos && chmod +x sealos && mv sealos /usr/bin
-```
-:::
-:::info[arm64下载]
-```shell
+  ```
+  </TabItem>
+  <TabItem value="arm64下载" label="arm64下载">
+  ```bash
 wget https://mirror.ghproxy.com/https://github.com/labring/sealos/releases/download/${VERSION}/sealos_${VERSION#v}_linux_arm64.tar.gz \
   && tar zxvf sealos_${VERSION#v}_linux_arm64.tar.gz sealos && chmod +x sealos && mv sealos /usr/bin
-```
-:::
+  ```
+  </TabItem>
+</Tabs>
     
 由于我们这里是 `Ubuntu` 系统，还可以使用包管理工具安装：
 **DEB源**
