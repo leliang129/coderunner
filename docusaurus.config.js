@@ -10,7 +10,7 @@ import { themes as prismThemes } from 'prism-react-renderer';
 const config = {
   title: '1cobot',
   tagline: '技术分享与学习平台',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/logo.svg',
 
   // Set the production url of your site here
   url: 'https://1cobot.com',
@@ -42,21 +42,14 @@ const config = {
         docs: {
           sidebarPath: './sidebars.js',
           routeBasePath: 'docs',
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
         },
         blog: {
           showReadingTime: true,
+          onUntruncatedBlogPosts: 'ignore',
           feedOptions: {
             type: ['rss', 'atom'],
             xslt: true,
           },
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          // Useful options to enforce blogging best practices
-          onInlineTags: 'warn',
-          onInlineAuthors: 'warn',
-          onUntruncatedBlogPosts: 'ignore',
         },
         theme: {
           customCss: './src/css/custom.css',
@@ -165,6 +158,14 @@ const config = {
       prism: {
         theme: prismThemes.github,
         darkTheme: prismThemes.dracula,
+      },
+      algolia: {
+        appId: 'YOUR_APP_ID',
+        apiKey: 'YOUR_SEARCH_API_KEY',
+        indexName: '1cobot',
+        contextualSearch: true,
+        searchParameters: {},
+        searchPagePath: 'search',
       },
     }),
 };

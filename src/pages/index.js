@@ -7,8 +7,20 @@ import {
   FaChartLine,
   FaCode,
   FaArrowRight,
-  FaCalendar
+  FaBook,
+  FaGithub,
+  FaYoutube,
+  FaMedium,
+  FaFileAlt,
+  FaTools,
+  FaGraduationCap,
+  FaBug,
+  FaRocket,
+  FaCloud,
+  FaServer,
+  FaChartBar
 } from 'react-icons/fa';
+import { SiKubernetes } from 'react-icons/si';
 import clsx from 'clsx';
 import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
@@ -16,7 +28,6 @@ import Layout from '@theme/Layout';
 import { useColorMode } from '@docusaurus/theme-common';
 import Heading from '@theme/Heading';
 import styles from './index.module.css';
-import { useBlogPosts } from '../utils/blogUtils';
 
 function HomepageHeader() {
   const { siteConfig } = useDocusaurusContext();
@@ -109,46 +120,116 @@ function Features() {
   );
 }
 
-function BlogSection() {
-  const sortedPosts = useBlogPosts();
+function ResourceSection() {
+  const resources = [
+    {
+      title: '技术文档',
+      icon: <FaBook className={styles.resourceIcon} />,
+      items: [
+        {
+          name: 'Kubernetes 官方文档',
+          description: '容器编排平台完整指南',
+          link: 'https://kubernetes.io/docs/home/',
+          icon: <SiKubernetes className={styles.itemIcon} />
+        },
+        {
+          name: 'Prometheus 文档',
+          description: '监控系统使用指南',
+          link: 'https://prometheus.io/docs/introduction/overview/',
+          icon: <FaChartBar className={styles.itemIcon} />
+        }
+      ]
+    },
+    {
+      title: '开源项目',
+      icon: <FaGithub className={styles.resourceIcon} />,
+      items: [
+        {
+          name: 'Argo CD',
+          description: 'Kubernetes 的声明式 GitOps 工具',
+          link: 'https://github.com/argoproj/argo-cd',
+          icon: <FaRocket className={styles.itemIcon} />
+        },
+        {
+          name: 'Grafana',
+          description: '可视化监控面板',
+          link: 'https://github.com/grafana/grafana',
+          icon: <FaChartLine className={styles.itemIcon} />
+        }
+      ]
+    },
+    {
+      title: '学习资源',
+      icon: <FaGraduationCap className={styles.resourceIcon} />,
+      items: [
+        {
+          name: '云原生课程',
+          description: 'Kubernetes 实战教程',
+          link: '/docs/k8s/1intro',
+          icon: <FaDocker className={styles.itemIcon} />
+        },
+        {
+          name: '监控系统搭建',
+          description: 'Prometheus + Grafana 实践',
+          link: '/docs/monitoring/1install_prometheus',
+          icon: <FaServer className={styles.itemIcon} />
+        }
+      ]
+    },
+    {
+      title: '技术博客',
+      icon: <FaFileAlt className={styles.resourceIcon} />,
+      items: [
+        {
+          name: '最佳实践',
+          description: '云原生应用部署案例',
+          link: '/blog',
+          icon: <FaTools className={styles.itemIcon} />
+        },
+        {
+          name: '故障排查',
+          description: '常见问题解决方案',
+          link: '/docs/troubleshooting/intro',
+          icon: <FaBug className={styles.itemIcon} />
+        }
+      ]
+    }
+  ];
 
   return (
-    <section className={styles.blogSection}>
-      <div className={styles.blogContainer}>
-        <div className={styles.sectionHeader}>
-          <h2>最新博客</h2>
-          <Link to="/blog" className={styles.viewAll}>
-            查看全部 <FaArrowRight />
-          </Link>
-        </div>
-        <div className={styles.blogGrid}>
-          {sortedPosts.length > 0 ? (
-            sortedPosts.map((post, idx) => (
-              <Link
-                key={post.metadata.id || post.metadata.permalink}
-                to={post.metadata.permalink}
-                className={styles.blogCard}
-              >
-                <div className={styles.featureItem}>
-                  <h3>{post.metadata.title}</h3>
-                  <p>{post.metadata.description || ''}</p>
-                  <div className={styles.blogMeta}>
-                    <span className={styles.blogDate}>
-                      <FaCalendar />
-                      {post.metadata.date
-                        ? new Date(post.metadata.date).toLocaleDateString('zh-CN')
-                        : '无日期'}
+    <section className={styles.resources}>
+      <div className={styles.resourcesContainer}>
+        <h2 className={styles.sectionTitle}>
+          资源导航
+          <span className={styles.sectionSubtitle}>精选技术资源，助力学习提升</span>
+        </h2>
+        <div className={styles.resourceGrid}>
+          {resources.map((category, idx) => (
+            <div key={idx} className={styles.resourceCategory}>
+              <h3 className={styles.categoryTitle}>
+                {category.icon}
+                {category.title}
+              </h3>
+              <div className={styles.resourceItems}>
+                {category.items.map((item, itemIdx) => (
+                  <Link
+                    key={itemIdx}
+                    to={item.link}
+                    className={styles.resourceItem}
+                  >
+                    <div className={styles.resourceItemHeader}>
+                      {item.icon}
+                      <h4>{item.name}</h4>
+                    </div>
+                    <p>{item.description}</p>
+                    <span className={styles.resourceArrow}>
+                      <FaArrowRight />
                     </span>
-                    <span className={styles.readMore}>
-                      阅读更多 <FaArrowRight />
-                    </span>
-                  </div>
-                </div>
-              </Link>
-            ))
-          ) : (
-            <div className={styles.noPosts}>暂无博客文章</div>
-          )}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>
@@ -164,7 +245,7 @@ export default function Home() {
       <HomepageHeader />
       <main>
         <Features />
-        <BlogSection />
+        <ResourceSection />
       </main>
     </Layout>
   );
