@@ -88,12 +88,14 @@ SealosVersion:
   platform: linux/amd64
 ```
 以及**二进制手动下载**：
-::: code-group
-```shell [amd64]
+:::info[amd64下载]
+```shell
 wget https://mirror.ghproxy.com/https://github.com/labring/sealos/releases/download/${VERSION}/sealos_${VERSION#v}_linux_amd64.tar.gz \
   && tar zxvf sealos_${VERSION#v}_linux_amd64.tar.gz sealos && chmod +x sealos && mv sealos /usr/bin
 ```
-```shell [arm64]
+:::
+:::info[arm64下载]
+```shell
 wget https://mirror.ghproxy.com/https://github.com/labring/sealos/releases/download/${VERSION}/sealos_${VERSION#v}_linux_arm64.tar.gz \
   && tar zxvf sealos_${VERSION#v}_linux_arm64.tar.gz sealos && chmod +x sealos && mv sealos /usr/bin
 ```
