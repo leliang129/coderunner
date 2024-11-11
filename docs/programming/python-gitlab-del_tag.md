@@ -1,5 +1,5 @@
 ---
-title: 删除GitLab指定标签
+title: Python-删除GitLab指定标签
 ---
 ```python
 import gitlab
