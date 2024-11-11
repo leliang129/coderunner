@@ -2,7 +2,7 @@
 slug: delete-tag
 title: Gitlab 删除指定 Tag
 authors: [1cobot]
-tags: [Python]
+tags: [Python, Gitlab]
 date: 2024-11-09
 ---
 ```python

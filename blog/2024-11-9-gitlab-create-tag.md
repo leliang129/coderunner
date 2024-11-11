@@ -2,7 +2,7 @@
 slug: create-tag
 title: Gitlab 创建 Tag
 authors: [1cobot]
-tags: [Python]
+tags: [Python, Gitlab]
 date: 2024-11-09
 ---
 ```python

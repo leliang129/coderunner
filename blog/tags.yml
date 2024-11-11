@@ -1,24 +1,45 @@
-facebook:
-  label: Facebook
-  permalink: /facebook
-  description: Facebook tag description
-
-hello:
-  label: Hello
-  permalink: /hello
-  description: Hello tag description
 
 docusaurus:
   label: Docusaurus
   permalink: /docusaurus
   description: Docusaurus tag description
 
-hola:
-  label: Hola
-  permalink: /hola
-  description: Hola tag description
-
-python:
+Python:
   label: Python
   permalink: /python
   description: Python tag description
+
+kubernetes:
+  label: Kubernetes
+  permalink: /kubernetes
+  description: Kubernetes tag description
+
+docker:
+  label: Docker
+  permalink: /docker
+  description: Docker tag description
+
+golang:
+  label: Golang
+  permalink: /golang
+  description: Golang tag description
+
+mysql:
+  label: MySQL
+  permalink: /mysql
+  description: MySQL tag description
+
+shell:
+  label: Shell
+  permalink: /shell
+  description: Shell tag description
+
+gitalb:
+  label: gitalb
+  permalink: /gitalb
+  description: gitalb tag description
+
+Gitlab:
+  label: Gitlab
+  permalink: /gitlab
+  description: Gitlab tag description
