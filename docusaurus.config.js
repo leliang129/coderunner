@@ -46,6 +46,9 @@ const config = {
         blog: {
           showReadingTime: true,
           onUntruncatedBlogPosts: 'ignore',
+          blogSidebarTitle: '博客列表',
+          blogSidebarCount: 'ALL',
+          postsPerPage: 'ALL',
           feedOptions: {
             type: ['rss', 'atom'],
             xslt: true,
