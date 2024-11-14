@@ -43,3 +43,8 @@ Gitlab:
   label: Gitlab
   permalink: /gitlab
   description: Gitlab tag description
+
+linux:
+  label: Linux
+  permalink: /linux
+  description: Linux tag description

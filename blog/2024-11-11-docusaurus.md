@@ -3,7 +3,6 @@ slug: docusaurus
 title: docusaurus代码块使用
 authors: [1cobot]
 tags: [docusaurus]
-date: 2024-11-11
 ---
 在 Docusaurus 中实现代码块的多个选项卡可以使用其提供的 `Tabs` 和 `TabItem` 组件。这些组件允许你创建一个选项卡式的界面，并在不同选项卡中展示不同的代码块或内容。
 
