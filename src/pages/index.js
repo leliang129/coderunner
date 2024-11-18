@@ -28,6 +28,7 @@ import Layout from '@theme/Layout';
 import { useColorMode } from '@docusaurus/theme-common';
 import Heading from '@theme/Heading';
 import styles from './index.module.css';
+import HotNews from '@site/src/components/HotNews';
 
 function HomepageHeader() {
   const { siteConfig } = useDocusaurusContext();
@@ -244,6 +245,7 @@ export default function Home() {
       description={siteConfig.tagline}>
       <HomepageHeader />
       <main>
+        <HotNews />
         <Features />
         <ResourceSection />
       </main>
