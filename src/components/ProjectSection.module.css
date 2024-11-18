@@ -1,12 +1,15 @@
 .projectSection {
   padding: 4rem 0;
-  background: var(--ifm-background-surface-color);
+  position: relative;
+  z-index: 1;
+  background: transparent;
 }
 
 .projectContainer {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 2rem;
+  position: relative;
 }
 
 .projectTitle {
@@ -51,7 +54,7 @@
 }
 
 .projectItem {
-  background: var(--ifm-background-color);
+  background: transparent;
   border-radius: 12px;
   padding: 1.5rem;
   display: flex;
@@ -59,18 +62,21 @@
   gap: 1rem;
   text-decoration: none;
   color: var(--ifm-font-color-base);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   position: relative;
-  border: 1px solid var(--ifm-color-emphasis-100);
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .projectItem:hover {
   transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
   text-decoration: none;
   color: var(--ifm-font-color-base);
-  border-color: var(--ifm-color-primary-lighter);
+  background: transparent;
+  box-shadow: none;
+  border: none;
 }
 
 .projectIcon {
@@ -153,4 +159,14 @@
     font-size: 1.5rem;
     padding: 0.8rem;
   }
+}
+
+/* Dark mode adjustments */
+[data-theme='dark'] .projectSection {
+  background: transparent;
+}
+
+[data-theme='dark'] .projectItem {
+  background: transparent;
+  border: none;
 } 

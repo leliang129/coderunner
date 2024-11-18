@@ -1,59 +1,24 @@
-.tutorialSection {
+.imagemirrorSection {
   padding: 4rem 0;
   position: relative;
   z-index: 1;
   background: transparent;
 }
 
-.tutorialContainer {
+.imagemirrorContainer {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 2rem;
   position: relative;
 }
 
-.tutorialTitle {
-  font-size: 2rem;
-  margin-bottom: 2.5rem;
-  font-weight: 700;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  position: relative;
-  padding-left: 1rem;
-  background: linear-gradient(120deg, var(--ifm-color-primary) 0%, var(--ifm-color-primary-dark) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.tutorialTitle::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0.5rem;
-  bottom: 0.5rem;
-  width: 4px;
-  background: var(--ifm-color-primary);
-  border-radius: 2px;
-}
-
-.tutorialSubtitle {
-  font-size: 1rem;
-  margin-top: 0.3rem;
-  font-weight: normal;
-  background: none;
-  -webkit-text-fill-color: var(--ifm-color-emphasis-600);
-  color: var(--ifm-color-emphasis-600);
-}
-
-.tutorialGrid {
+.imagemirrorGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1.5rem;
 }
 
-.tutorialItem {
+.imagemirrorItem {
   background: transparent;
   border-radius: 12px;
   padding: 1.5rem;
@@ -70,7 +35,7 @@
   -webkit-backdrop-filter: none;
 }
 
-.tutorialItem:hover {
+.imagemirrorItem:hover {
   transform: translateY(-5px);
   text-decoration: none;
   color: var(--ifm-font-color-base);
@@ -79,11 +44,11 @@
   border: none;
 }
 
-.tutorialIcon {
+.imagemirrorIcon {
   font-size: 1.8rem;
   color: var(--ifm-color-primary);
   padding: 1rem;
-  background: var(--ifm-color-emphasis-100);
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -91,18 +56,18 @@
   transition: all 0.3s ease;
 }
 
-.tutorialItem:hover .tutorialIcon {
+.imagemirrorItem:hover .imagemirrorIcon {
   background: var(--ifm-color-primary);
   color: white;
   transform: scale(1.1);
 }
 
-.tutorialContent {
+.imagemirrorContent {
   flex: 1;
   min-width: 0;
 }
 
-.tutorialContent h3 {
+.imagemirrorContent h3 {
   margin: 0 0 0.5rem 0;
   font-size: 1.2rem;
   font-weight: 600;
@@ -110,18 +75,18 @@
   transition: color 0.3s ease;
 }
 
-.tutorialItem:hover .tutorialContent h3 {
+.imagemirrorItem:hover .imagemirrorContent h3 {
   color: var(--ifm-color-primary);
 }
 
-.tutorialContent p {
+.imagemirrorContent p {
   margin: 0;
   font-size: 0.9rem;
   color: var(--ifm-color-emphasis-700);
   line-height: 1.6;
 }
 
-.tutorialArrow {
+.imagemirrorArrow {
   position: absolute;
   right: 1.5rem;
   top: 50%;
@@ -132,41 +97,41 @@
   transition: all 0.3s ease;
 }
 
-.tutorialItem:hover .tutorialArrow {
+.imagemirrorItem:hover .imagemirrorArrow {
   opacity: 1;
   right: 1rem;
   color: var(--ifm-color-primary);
 }
 
-@media (max-width: 996px) {
-  .tutorialSection {
-    padding: 3rem 0;
-  }
-
-  .tutorialContainer {
-    padding: 0 1.5rem;
-  }
-
-  .tutorialGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .tutorialItem {
-    padding: 1.5rem;
-  }
-
-  .tutorialIcon {
-    font-size: 1.5rem;
-    padding: 0.8rem;
-  }
-}
-
 /* Dark mode adjustments */
-[data-theme='dark'] .tutorialSection {
+[data-theme='dark'] .imagemirrorSection {
   background: transparent;
 }
 
-[data-theme='dark'] .tutorialItem {
+[data-theme='dark'] .imagemirrorItem {
   background: transparent;
   border: none;
 }
+
+@media (max-width: 996px) {
+  .imagemirrorSection {
+    padding: 3rem 0;
+  }
+
+  .imagemirrorContainer {
+    padding: 0 1.5rem;
+  }
+
+  .imagemirrorGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .imagemirrorItem {
+    padding: 1.5rem;
+  }
+
+  .imagemirrorIcon {
+    font-size: 1.5rem;
+    padding: 0.8rem;
+  }
+} 

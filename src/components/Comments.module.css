@@ -1,28 +1,29 @@
 .commentsSection {
-  padding: 3rem 0 1rem 0;
-  background: none;
-  width: 100%;
-  margin: 0;
+  padding: 4rem 0;
+  position: relative;
+  z-index: 1;
+  background: transparent;
 }
 
 .commentsContainer {
-  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 2rem;
-  box-sizing: border-box;
+  position: relative;
 }
 
 .musicComment {
-  width: 100%;
-  background: var(--ifm-background-color);
-  border-radius: 12px;
+  background: transparent;
+  border-radius: 16px;
   padding: 2rem 2.5rem;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
   display: flex;
-  gap: 2.5rem;
+  gap: 3rem;
   align-items: center;
-  box-sizing: border-box;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  color: rgba(0, 0, 0, 0.85);
 }
 
 .musicInfo {
@@ -47,22 +48,24 @@
 }
 
 .songTitle {
-  font-size: 1.2rem;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.9);
   margin-bottom: 0.5rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: var(--ifm-color-primary);
 }
 
 .singer,
 .album {
-  font-size: 0.95rem;
+  font-size: 1.1rem;
+  color: rgba(0, 0, 0, 0.75);
+  font-weight: 500;
   margin-bottom: 0.3rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: var(--ifm-color-emphasis-700);
 }
 
 .commentContent {
@@ -75,7 +78,9 @@
 
 .comment {
   font-size: 1.1rem;
-  line-height: 1.7;
+  line-height: 1.8;
+  color: rgba(0, 0, 0, 0.85);
+  font-weight: 500;
   margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -147,4 +152,25 @@
     border-top: 2px solid var(--ifm-color-emphasis-200);
     padding: 1.5rem 0 0;
   }
+}
+
+/* Dark mode adjustments */
+[data-theme='dark'] .commentsSection {
+  background: transparent;
+}
+
+[data-theme='dark'] .musicComment {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+[data-theme='dark'] .songTitle {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+[data-theme='dark'] .singer,
+[data-theme='dark'] .album,
+[data-theme='dark'] .comment {
+  color: rgba(255, 255, 255, 0.85);
 }

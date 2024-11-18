@@ -1,12 +1,15 @@
 .resourceSection {
   padding: 4rem 0;
-  background: var(--ifm-background-surface-color);
+  position: relative;
+  z-index: 1;
+  background: transparent;
 }
 
 .resourceContainer {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 2rem;
+  position: relative;
 }
 
 .resourceTitle {
@@ -51,7 +54,7 @@
 }
 
 .resourceItem {
-  background: var(--ifm-background-color);
+  background: transparent;
   border-radius: 12px;
   padding: 1.5rem;
   display: flex;
@@ -59,18 +62,21 @@
   gap: 1rem;
   text-decoration: none;
   color: var(--ifm-font-color-base);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   position: relative;
-  border: 1px solid var(--ifm-color-emphasis-100);
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .resourceItem:hover {
   transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
   text-decoration: none;
   color: var(--ifm-font-color-base);
-  border-color: var(--ifm-color-primary-lighter);
+  background: transparent;
+  box-shadow: none;
+  border: none;
 }
 
 .resourceIcon {
@@ -97,11 +103,10 @@
 }
 
 .resourceContent h3 {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: var(--ifm-heading-color);
-  transition: color 0.3s ease;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.9);
+  margin-bottom: 0.5rem;
 }
 
 .resourceItem:hover .resourceContent h3 {
@@ -109,10 +114,10 @@
 }
 
 .resourceContent p {
-  margin: 0;
-  font-size: 0.9rem;
-  color: var(--ifm-color-emphasis-700);
+  font-size: 1rem;
+  color: rgba(0, 0, 0, 0.75);
   line-height: 1.6;
+  font-weight: 500;
 }
 
 .resourceArrow {
@@ -153,4 +158,22 @@
     font-size: 1.5rem;
     padding: 0.8rem;
   }
+}
+
+/* Dark mode adjustments */
+[data-theme='dark'] .resourceSection {
+  background: transparent;
+}
+
+[data-theme='dark'] .resourceItem {
+  background: transparent;
+  border: none;
+}
+
+[data-theme='dark'] .resourceContent h3 {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+[data-theme='dark'] .resourceContent p {
+  color: rgba(255, 255, 255, 0.85);
 } 
