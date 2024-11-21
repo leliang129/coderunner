@@ -233,27 +233,31 @@
 
 .features {
   padding: 4rem 2rem;
-  background: white;
+  background: var(--ifm-background-surface-color);
+  border-bottom: 1px solid var(--ifm-color-emphasis-100);
 }
 
 .featuresInner {
   max-width: 1200px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-  padding: 0 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
 }
 
 .featureItem {
   padding: 2rem;
-  border-radius: 0.5rem;
-  background: var(--ifm-background-surface-color);
+  border-radius: 1rem;
+  background: white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
   text-align: center;
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
 }
 
 .featureItem::before {
@@ -263,7 +267,7 @@
   left: 0;
   width: 100%;
   height: 4px;
-  background: linear-gradient(90deg, var(--ifm-color-primary-lighter), var(--ifm-color-primary));
+  background: linear-gradient(90deg, var(--ifm-color-primary), var(--ifm-color-primary-dark));
   opacity: 0;
   transition: all 0.3s ease;
 }
@@ -273,25 +277,33 @@
 }
 
 .featureIcon {
-  font-size: 2rem;
+  font-size: 2.5rem;
   color: var(--ifm-color-primary);
-  margin-bottom: 1rem;
+  transition: all 0.3s ease;
 }
 
 .featureItem:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transform: translateY(-6px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.featureItem:hover .featureIcon {
+  transform: scale(1.1);
+  color: var(--ifm-color-primary-darker);
 }
 
 .featureItem h3 {
-  margin-bottom: 1rem;
-  color: var(--ifm-color-primary);
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--ifm-color-emphasis-900);
+  font-weight: 600;
 }
 
 .featureItem p {
   margin: 0;
-  color: var(--ifm-font-color-base);
+  color: var(--ifm-color-emphasis-600);
   line-height: 1.6;
+  font-size: 0.95rem;
 }
 
 .techStack {
@@ -752,7 +764,7 @@
   .decoratorWave {
     display: none;
   }
-  
+
   .titleDecoration {
     width: 30px;
     margin-left: 10px;
@@ -784,6 +796,25 @@
 
   .dailyQuote {
     max-width: 100%;
+  }
+
+  .features {
+    padding: 3rem 1rem;
+  }
+
+  .featuresInner {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .featureItem {
+    padding: 1.5rem;
+  }
+
+  .featureIcon {
+    width: 56px;
+    height: 56px;
+    font-size: 2rem;
   }
 }
 
