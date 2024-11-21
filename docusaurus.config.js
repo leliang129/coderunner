@@ -53,6 +53,8 @@ const config = {
             type: ['rss', 'atom'],
             xslt: true,
           },
+          path: 'blog',
+          routeBasePath: 'blog',
         },
         theme: {
           customCss: './src/css/custom.css',
@@ -64,12 +66,13 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       // Replace with your project's social card
-      image: 'img/docusaurus-social-card.jpg',
+      image: 'img/social-card.jpg',
       navbar: {
         title: '1cobot',
         logo: {
-          alt: 'CodeRunner Logo',
+          alt: '1cobot Logo',
           src: 'img/logo.svg',
+          srcDark: 'img/logo-dark.svg',
         },
         items: [
           {
