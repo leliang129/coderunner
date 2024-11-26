@@ -41,7 +41,7 @@ const navigationItems = [
     title: '故障排查',
     description: '问题定位与解决方案',
     icon: <FaBug />,
-    link: '/docs/troubleshooting/intro',
+    link: '/docs/linux/intro',
   },
   {
     title: '最佳实践',

@@ -52,7 +52,7 @@ const resources = [
     title: '故障排查',
     description: '常见问题解决方案',
     icon: <FaBug />,
-    link: '/docs/troubleshooting/intro'
+    link: '/docs/linux/intro'
   }
 ];
 
