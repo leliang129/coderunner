@@ -15,7 +15,8 @@ import {
   FaEnvelopeOpen,
   FaTerminal,
   FaRegular,
-  FaStream
+  FaStream,
+  FaPython
 } from 'react-icons/fa';
 import { 
   SiJson,
