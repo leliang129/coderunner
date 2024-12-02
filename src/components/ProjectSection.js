@@ -121,6 +121,12 @@ const projects = [
     description: '将 cURL 命令自动转换为 Python 请求代码',
     icon: <FaTerminal />,
     link: 'https://curlconverter.com/'
+  },
+  {
+    title: 'Python标准库文档',
+    description: 'Python 标准库文档，包含所有内置模块和函数',
+    icon: <FaPython />,
+    link: 'https://docs.python.org/zh-cn/3/library/index.html'
   }
 ];
 
