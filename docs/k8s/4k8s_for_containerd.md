@@ -123,13 +123,15 @@ vm.swappiness = 0
 创建 `/etc/sysconfig/modules/ipvs.modules` 文件，保证在节点重启后能自动加载所需模块。使用 `lsmod | grep -e ip_vs -e nf_conntrack_ipv4` 命令查看是否已经正确加载所需的内核模块。
 ```shell title=/etc/sysconfig/modules/ipvs.modules
 [root@master-1 ~]# cat > /etc/sysconfig/modules/ipvs.modules <<EOF
-> #!/bin/bash
-> modprobe -- ip_vs
-> modprobe -- ip_vs_rr
-> modprobe -- ip_vs_wrr
-> modprobe -- ip_vs_sh
-> modprobe -- nf_conntrack_ipv4
-> EOF
+#!/bin/bash
+modprobe -- ip_vs
+modprobe -- ip_vs_rr
+modprobe -- ip_vs_wrr
+modprobe -- ip_vs_sh
+modprobe -- nf_conntrack_ipv4
+EOF
+
+[root@master-1 ~]# chmod 755 /etc/sysconfig/modules/ipvs.modules && bash /etc/sysconfig/modules/ipvs.modules && lsmod | grep -e ip_vs -e nf_conntrack_ipv4
 
 # 查看内核模块加载信息
 [root@master-1 ~]# lsmod | grep -e ip_vs -e nf_conntrack_ipv4
