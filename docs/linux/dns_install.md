@@ -228,4 +228,115 @@ systemctl enable --now # 首次启动
 rndc reload            # 非首次启动
 ```
 ### 实现web服务
-略
+实现步骤省略
+
+在客户端实现测试
+```shell
+# 修改dns记录
+vim /etc/sysconfig/network-scripts/ifcfg-eth0
+dns1=172.16.41.8
+
+# 重启网卡
+systemctl restart network
+
+#验证dns
+cat /etc/resolv.conf
+
+nameserver 172.16.41.8
+
+# 测试网页,能显示就是成功
+curl www.example.com
+```
+
+## 允许动态更新
+动态更新：可以通过远程更新区域数据库的资源记录     
+实现动态更新，需要在制定的zone语句块中：
+```shell
+Allow-update {any;};
+```
+示例：
+```shell
+chmod 770 /var/named
+
+# 执行命令，交互式
+nsupdate
+>server 127.0.0.1
+>zone example.com
+>update add ftp.example.com 86400 IN A 6.6.6.6
+>send
+>update delete www.example.com A
+>send
+
+# 测试
+dig ftp.example.com @127.0.0.1
+ls -l /var/named/example.com.zone.jnl
+cat /var/named/example.com.zone
+```
+
+## 启用dns客户端缓存功能
+>在高并发的服务器场景应用中，对dns的服务器查询性能有较高的要求，若在客户端启用dns缓存功能，可以大幅度减轻dns服务器的压力，同时也能提高dns客户端明星解析速度。
+### centos启用客户端缓存
+>centos默认没有启用dns客户端缓存，需要借助第三方软件，安装nscd包可以支持dns缓存功能，减少dns服务器的压力，提高dns查询速度
+```shell
+# 安装
+yum install -y nscd
+# 启动服务
+systemctl enable --now nscd
+     
+# 查看缓存统计信息
+nscd -g
+
+# 清除dns客户端缓存
+nscd -i hosts
+```
+### ubuntu启用dns客户端缓存
+>ubuntu默认会启用dns客户端缓存
+```shell
+systemctl status systemd-resolved.service
+
+#  查看帮助
+systemd-resolve --help
+
+# 清空缓存
+systemd-resolve --flush-caches
+systemd-resolve --statistics
+```
+
+## 实现反向解析区域
+### 反向解析配置
+  - 反向区域：即将IP反向解析为域名
+  - 区域名称：网络地址反写.ip-addr.arpa
+    
+示例：
+```shell
+172.16.100.  --> 100.16.172.in-addr.arpa.
+```
+
+1)定义区域
+```shell
+zone "ZONE_NAME" IN {
+  type {master|slave|forward};
+  file "网络地址.zone"  
+};
+```
+2)定义区域解析库文件   
+注意：不需要A记录，以PTR记录为主   
+示例：
+```shell
+$TTL 86400
+$ORIGIN 16.172.in-addr.arpa.
+@     IN    SOA   ns1.example.com.    admin.example.com. (
+            20250114
+            1H
+            5M
+            7D
+            1D)
+      IN    NS    ns1.example.com.
+1.2   IN    PTR   www.example.com.
+3.4   IN    PTR   mx.example.com.
+```
+实现以下解析：
+```shell
+172.16.1.2 www.example.com
+172.16.3.4 mx.example.com
+```
