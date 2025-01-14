@@ -340,3 +340,449 @@ $ORIGIN 16.172.in-addr.arpa.
 172.16.1.2 www.example.com
 172.16.3.4 mx.example.com
 ```
+## 案例：反向解析
+1) 查看主配置文件
+```shell
+cat /etc/named.conf 
+
+options {
+ ......
+ listen-on port 53 { localhost; };
+ ......
+ allow-query     { any; };
+ ......
+}
+```
+2）编辑区域文件
+```shell
+vim /etc/named.rfc1912.zones
+
+zone "0.0.10.in-addr.arpa" {
+   type master;
+   file "10.0.0.zone";
+};
+```
+3) 编辑区域数据库文件
+```shell
+cat 10.0.0.zone 
+$TTL 1D
+@     IN    SOA     ns1.example.com. admin.example.com. (
+            0; serial
+            1D; refresh
+            1H; retry
+            1W; expire
+            3H ); minimum
+             NS ns1.example.com. # NS记录必须以点结束，否则配置A记录才可以启动
+100 PTR www.example.com.
+200 PTR mx.example.com.
+```
+
+4) 检查配置文件格式
+```shell
+named-checkconf
+named-checkzone 10.0.0.in-addr.arpa /var/named/10.0.0.zone
+```
+
+5) 启动服务
+```shell
+systemctl restart named
+rndc reload
+```
+
+## 实现dns主从服务器
+>只有一台主DNS服务器，存在单点失败的问题，可以建立主DNS服务器的备份服务器，即从服务器来实现DNS服务的容错机制。从服务器可以自动和主服务器进行单向的数据同步，从而和主DNS服务器一样，也可以对外提供查询服务，但从服务器不提供数据更新服务。
+### DNS主从服务器
+ - 应该是一台独立的名称服务器
+ - 主服务器的区域解析库文件中必须有一条NS记录指向从服务器
+ - 从服务器的区域解析库文件中必须有一条SOA记录指向主服务器从服务器只需要定义区域，而无须提供解析库文件；解析库文件应该放置于/var/named/slaves/目录中
+ - 主服务器得允许从服务器作区域传送
+ - 主从服务器时间应该同步，可通过ntp进行
+ - bind程序的版本应该保持一致；否则，应该从高，主低
+
+### 定义从区域
+格式：
+```shell
+zone "ZONE_NAME" IN {
+ type slave;
+ masters { MASTER_IP; };
+ file "slaves/ZONE_NAME.zone";
+};
+```
+## 案例：实现dns主从服务器
+### 实验目的
+```shell
+搭建DNS主从服务器架构，实现DNS服务冗余
+```
+### 实验环境
+```shell
+# 需要四台主机
+DNS主服务器：172.16.41.8
+DNS从服务器:172.16.41.18
+web服务器：172.16.41.7
+DNS客户端：172.16.41.6
+```
+### 前提准备
+```shell
+关闭selinux
+关闭防火墙
+时间同步
+```
+### 实现步骤
+1）主dns服务器配置
+```shell
+# 安装
+yum install bind -y
+# 修改主配置文件
+vim /etc/named.conf
+#注释掉下面两行
+// listen-on port 53 { 127.0.0.1; };
+// allow-query     { localhost; };
+#只允许从服务器进行区域传输
+allow-transfer { 从服务器IP;}; 
+vim /etc/named.rfc1912.zones    
+#加上这段
+zone "example.com" {
+   type master;
+   file  "example.com.zone";
+};
+```
+2) 编辑区域数据库文件
+```shell
+cp -p /var/named/named.localhost /var/named/example.com.zone
+#如果没有-p，需要改权限。chgrp named example.com.zone
+vim /var/named/example.com.zone
+$TTL 1D
+@    IN     SOA    master admin.example.com. (
+        1 ; serial
+        1D ; refresh
+        1H ; retry
+        1W ; expire
+        3H ) ; minimum
+            NS   master
+            NS slave
+master      A    172.16.41.8
+slave       A    172.16.41.18
+```
+3) 检查配置文件格式
+```shell
+named-checkconf
+named-checkzone example.com /var/named/example.com.zone
+```
+4) 启动主dns服务
+```shell
+systemctl restart named
+rndc reload
+```
+
+5) 从服务器配置
+```shell
+# 安装
+yum install bind -y
+
+# 修改主配置文件
+vim /etc/named.conf
+
+// listen-on port 53 { 127.0.0.1; };
+// allow-query     { localhost; };
+#不允许其它主机进行区域传输
+   allow-transfer { none;};
+
+vim /etc/named.rfc1912.zones
+
+zone "example.com" {
+   type slave;
+   masters { 主服务器IP;};                                                       
+         
+   file "slaves/example.com.slave";
+};
+```
+6）检查配置文件格式
+```shell
+named-checkconf
+named-checkzone example.com /var/named/slaves/example.com.slave
+```
+7) 启动从dns服务
+```shell
+systemctl restart named
+rndc reload
+```
+8) 测试
+```shell
+# 修改客户端dns
+vim /etc/sysconfig/network-scripts/ifcfg-eth0
+DNS1=主服务器
+DNS2=从服务器
+
+# 重启网卡
+systemctl restart network
+# 测试
+dig www.example.com 
+curl www.example.com
+
+#在主服务器上停止DNS服务
+systemctl stop named
+
+#验证从DNS服务器仍然可以查询
+dig www.example.com 
+curl www.example.com
+```
+## 实现子域
+>将子域委派给其它主机管理，实现分布式DNS数据库
+正向解析区域子域方法    
+范例：定义两个子域区域
+```shell
+shanghai.example.com. IN NS ns1.ops.example.com.
+shanghai.example.com. IN NS ns2.ops.example.com.
+shenzhen.example.com. IN NS ns1.shenzhen.example.com.
+shenzhen.example.com. IN NS ns2.shenzhen.example.com.
+ns1.shanghai.example.com. IN A 1.1.1.1
+ns2.shanghai.example.com. IN A 1.1.1.2
+ns1.shenzhen.example.com. IN A 1.1.1.3
+ns2.shenzhen.example.com. IN A 1.1.1.4
+```
+## 案例：实现子域
+![](https://pic1.imgdb.cn/item/6786680ed0e0a243d4f43dde.png)
+### 实验目的
+```
+搭建DNS父域和子域服务器
+``` 
+### 环境要求
+```shell
+# 需要五台主机
+DNS父域服务器：172.16.41.8
+DNS子域服务器：172.16.41.18
+父域的web服务器：172.16.41.7，www.example.org
+子域的web服务器：172.16.41.17,www.shanghai.example.org
+DNS客户端：172.16.41.6
+```
+### 前提准备
+```shell
+关闭SElinux
+关闭防火墙
+时间同步
+```
+### 实现步骤
+1）在父域DNS服务器上实现主example.com域的主DNS服务
+```shell
+# 安装
+yum install bind -y
+
+# 编辑主配置文件
+vim /etc/named.conf
+
+#注释掉下面两行
+// listen-on port 53 { 127.0.0.1; };
+// allow-query     { localhost; };
+
+#只允许从服务器进行区域传输
+allow-transfer { 从服务器IP;}; 
+
+#建议关闭加密验证
+dnssec-enable no; 
+dnssec-validation no;
+
+
+# 编辑区域文件
+vim /etc/named.rfc1912.zones
+#加上这段
+zone "example.com" {
+   type master;
+   file  "example.com.zone";
+};
+
+# 编辑区域数据库文件
+cp -p /var/named/named.localhost /var/named/example.com.zone
+#如果没有-p，需要改权限。chgrp named example.com.zone
+
+vim /var/named/example.com.zone 
+
+$TTL 1D
+@     IN    SOA     master    admin.example.com. (
+          1 ; serial
+          1D ; refresh
+          1H ; retry
+          1W ; expire
+          3H ) ; minimum
+            NS   master
+shanghai    NS   shanghains
+master      A    172.16.41.8
+shanghains  A    172.16.41.18 
+www         A    172.16.41.7
+
+# 启动服务
+systemctl start named   # 首次启动
+rndc reload             # 非首次启动
+```
+
+2）实现子域的DNS服务器
+```shell
+# 安装
+yum install bind -y
+
+# 编辑配置文件
+// listen-on port 53 { 127.0.0.1; };
+// allow-query     { localhost; };
+allow-transfer { none;};
+
+# 编辑区域文件
+vim /etc/named.rfc1912.zones
+
+zone "shanghai.example.com" {
+   type master;
+   file "shanghai.example.com.zone";
+};
+
+# 编辑区域数据库文件
+cp -p /var/named/named.localhost /var/named/shanghai.example.com.zone
+#如果没有-p，需要改权限。chgrp named example.com.zone
+vim /var/named/shanghai.example.com.zone
+$TTL 1D
+@   IN  SOA   master  admin.example.com. (
+                   2019042214 ; serial
+                   1D ; refresh
+                   1H ; retry
+                   1W ; expire
+                   3H )   ; minimum
+         NS   master
+master   A    10.0.0.18
+www      A    10.0.0.17
+
+# 启动服务
+systemctl start named   # 首次启动
+rndc reload             # 非首次启动
+```
+3）实现web服务器
+略
+
+4）测试
+```shell
+dig www.shanghai.example.com
+www.shanghai.example.com
+```
+
+## 实现 DNS 转发（缓存）服务器
+### DNS转发
+>利用DNS转发，可以将用户的DNS请求，转发至指定的DNS服务，而非默认的根DNS服务器，并将指定服务器查询的返回结果进行缓存，提高效率。
+    
+注意:
+  - 被转发的服务器需要能够为请求者做递归，否则转发请求不予进行
+  - 在/etc/named.conf的全局配置块中，关闭dnssec功能
+```shell
+dnssec-enable no;
+dnssec-validation no;
+```
+### 转发方式
+1）全局转发
+>对非本机所负责解析区域的请求，全转发给指定的服务器
+在全局配置块中实现：
+```shell
+Options {
+   forward first|only;
+   forwarders { ip;};
+};
+```
+2）特定区域转发
+>仅转发对特定的区域的请求，比全局转发优先级高
+```shell
+zone "ZONE_NAME" IN {
+   type forward;
+   forward first|only;
+   forwarders { ip;};
+};
+```
+:::info
+first：先转发至指定DNS服务器，如果无法解析查询请求，则本服务器再去根服务器查询    
+only: 先转发至指定DNS服务器，如果无法解析查询请求，则本服务器将不再去根服务器查询   
+:::
+
+## 案例：实现DNS forward（缓存）服务器
+### 实验目的
+```shell
+搭建DNS转发（缓存）服务器
+```
+### 实验环境
+```shell
+# 需要四台主机
+DNS主服务器：172.16.41.8
+DNS从服务器:172.16.41.18
+web服务器：172.16.41.7
+DNS客户端：172.16.41.6
+```
+### 前提准备
+```shell
+关闭selinux
+关闭防火墙
+时间同步
+```
+### 实现步骤
+1）实现转发（只缓存）DNS服务器
+```shell
+# 安装
+yum install bind -y
+
+# 编辑配置文件
+vim /etc/named.conf  
+
+#注释掉两行
+// listen-on port 53 { 127.0.0.1; };
+// allow-query     { localhost; };
+forward first;
+forwarders { 172.16.41.18;};
+
+#关闭dnsec功能
+dnssec-enable no;
+dnssec-validation no;
+
+# 重启服务
+systemctl start named          # 首次启动
+rndc reload                    # 非首次启动
+```
+2）实现主DNS服务器
+```shell
+# 安装
+yum install bind -y
+
+# 编辑配置文件
+vim /etc/named.conf             
+#注释掉两行
+// listen-on port 53 { 127.0.0.1; };
+// allow-query     { localhost; };
+
+# 编辑区域文件
+vim /etc/named.rfc1912.zones    
+#加上下面这段
+zone "example.com" {
+   type master;
+   file  "example.com.zone";
+};
+
+# 编辑区域数据库文件
+cp -p /var/named/named.localhost /var/named/example.com.zone
+#如果没有-p，需要改权限。chgrp named example.com.zone
+
+vim /var/named/example.com.zone
+$TTL 1D
+@       IN    SOA     master    admin.example.com. (
+                   20250114; serial
+                   1D; refresh
+                   1H; retry
+                   1W; expire
+                   3H); minimum
+              NS      master
+master        A       172.16.41.18
+websrv        A       172.16.41.7                          
+www           CNAME   websrv
+
+# 启动服务
+systemctl start named   # 首次启动
+rndc reload             # 非首次启动
+```
+3） 实现web服务
+略
+
+4）测试
+```shell
+#客户端配置（参看前面案例，略）
+dig www.example.com    
+curl www.example.com
+```
