@@ -777,7 +777,7 @@ www           CNAME   websrv
 systemctl start named   # 首次启动
 rndc reload             # 非首次启动
 ```
-3） 实现web服务
+3） 实现web服务   
 略
 
 4）测试
@@ -786,3 +786,269 @@ rndc reload             # 非首次启动
 dig www.example.com    
 curl www.example.com
 ```
+
+## 智能DNS相关技术
+### bind中ACL
+ACL：把一个或多个地址归并为一个集合，并通过一个统一的名称调用   
+注意：只能先定义后使用；因此一般定义在配置文件中，处于options的前面   
+格式：
+```shell
+acl <acl_name> {
+    ip;
+    net/prelen;
+    ......
+};
+```
+
+示例：
+```shell
+acl beijingnet {
+    172.16.0.0/16;
+    10.10.10.10;
+};
+```
+### 内置acl
+ - none：没有一个主机
+ - any：任意主机
+ - localhost：本机
+ - localnet：本机的ip同掩码运算后得到的网络地址
+### 访问控制的指令
+ - allow-query {}： 允许查询的主机；白名单
+ - allow-transfer {}：允许区域传送的主机；白名单
+ - allow-recursion {}: 允许递归的主机,建议全局使用
+ - allow-update {}: 允许更新区域数据库中的内容
+
+### view视图
+>View：视图，将ACL和区域数据库实现对应关系，以实现智能DNS
+  - 一个bind服务器可定义多个view，每个view中可定义一个或多个zone
+  - 每个view用来匹配一组客户端
+  - 多个view内可能需要对同一个区域进行解析，但使用不同的区域解析库文件
+     
+注意：
+  - 一旦启用了view，所有的zone都只能定义在view中
+  - 仅在允许递归请求的客户端所在view中定义根区域
+  - 客户端请求到达时，是自上而下检查每个view所服务的客户端列表
+     
+**view格式**
+```shell
+view VIEW_NAME {
+    match-clients { beijingnet; };
+    zone "example.com" {
+    type master;
+    file "example.com.zone.bj"; 
+ };
+    include "/etc/named.rfc1912.zones";
+};
+
+view VIEW_NAME {
+    match-clients { shanghainet; };
+    zone "example.com" {
+    type master;
+    file "example.com.zone.sh"; 
+ };
+    include "/etc/named.rfc1912.zones";
+};
+```
+## 案例：利用view实现智能dns
+### 实验目的
+```shell
+搭建DNS主从服务器架构，实现DNS服务冗余
+```
+### 环境要求
+```
+需要五台主机
+DNS主服务器和web服务器1：10.0.0.8/24，172.16.0.8/16
+web服务器2：10.0.0.7/24
+web服务器3：172.16.0.7/16
+DNS客户端1：10.0.0.6/24 
+DNS客户端2：172.16.0.6/16
+```
+### 前提准备
+```
+关闭SElinux
+关闭防火墙
+时间同步
+```
+### 实现步骤
+1）dns服务器网卡配置
+```
+#配置两个IP地址
+#eth0：10.0.0.8/24
+#eth1: 172.16.0.8/16
+```
+2）主dns服务端配置文件实现view
+```
+# 安装
+yum install bind -y
+
+# 编辑配置文件
+vim /etc/named.conf
+
+#在文件最前面加下面行
+acl beijingnet {
+    10.0.0.0/24;
+};
+acl shanghainet {
+    172.16.0.0/16;
+};
+acl othernet {
+   any;
+};
+
+#注释掉下面两行
+// listen-on port 53 { 127.0.0.1; };
+// allow-query     { localhost; };
+#其它略
+
+# 创建view
+view beijingview {
+   match-clients { beijingnet;};
+   include "/etc/named.rfc1912.zones.bj";
+};
+view shanghaiview {
+   match-clients { shanghainet;};
+   include "/etc/named.rfc1912.zones.sh";
+};
+view otherview {
+   match-clients { othernet;};
+   include "/etc/named.rfc1912.zones.other";
+};
+include "/etc/named.root.key";
+```
+3）实现区域配置文件
+```
+vim /etc/named.rfc1912.zones.bj
+
+zone "." IN {
+   type hint;
+   file "named.ca";
+};
+zone "example.com" {
+   type master;
+   file "example.com.zone.bj";
+};
+
+vim /etc/named.rfc1912.zones.sh
+
+zone "." IN {
+   type hint;
+   file "named.ca";
+};
+zone "example.com" {
+   type master;
+   file "example.com.zone.sh";
+};
+
+vim /etc/named.rfc1912.zones.other
+
+zone "." IN {
+   type hint;
+   file "named.ca";
+};
+zone "example.com" {
+   type master;
+   file "example.com.zone.other";
+};
+
+chgrp named /etc/named.rfc1912.zones.bj
+chgrp named /etc/named.rfc1912.zones.sh
+chgrp named /etc/named.rfc1912.zones.other
+```
+4）创建区域数据库文件
+```shell
+vim /var/named/example.com.zone.bj
+
+$TTL 1D
+@           IN      SOA     master admin.example.com. (
+                    2019042214 ; serial
+                    1D ; refresh
+                    1H ; retry
+                    1W ; expire
+                    3H )   ; minimum
+                    NS     master
+master              A      10.0.0.8
+websrv              A      10.0.0.7                          
+www                 CNAME  websrv
+
+vim /var/named/example.com.zone.sh
+$TTL 1D
+@           IN      SOA     master admin.example.com. (
+                    2019042214 ; serial
+                    1D ; refresh
+                    1H ; retry
+                    1W ; expire
+                    3H )   ; minimum
+                    NS     master
+master              A      10.0.0.8
+websrv              A      172.16.0.7                          
+www                 CNAME  websrv
+
+vim /var/named/example.com.zone.other
+$TTL 1D
+@           IN      SOA     master     admin.example.com. (
+                    2019042214 ; serial
+                    1D ; refresh
+                    1H ; retry
+                    1W ; expire
+                    3H )   ; minimum
+                    NS     master
+master              A      10.0.0.8
+websrv              A      127.0.0.1                          
+www                 CNAME  websrv
+
+# 修改权限
+chgrp named /var/named/example.com.zone.bj
+chgrp named /var/named/example.com.zone.sh
+chgrp named /var/named/example.com.zone.other
+
+# 重启服务
+systemctl start named          # 首次启动
+rndc reload                    # 非首次启动
+```
+5）实现位于不同区域的web服务器
+```
+#分别在三台主机上安装http服务
+#在web服务器1：10.0.0.8/24实现
+yum install httpd                        
+echo www.example.com in Other > /var/www/html/index.html
+
+# 重启服务
+systemctl start httpd  
+
+#在web服务器2：10.0.0.7/16
+echo www.example.com in Beijing > /var/www/html/index.html
+
+# 重启服务
+systemctl start httpd  
+
+#在web服务器3：172.16.0.7/16
+yum install httpd                        
+echo www.example.com in Shanghai > /var/www/html/index.html
+
+# 重启服务
+systemctl start httpd
+```
+6）测试
+```shell
+#分别在三台主机上访问
+
+#DNS客户端1：10.0.0.6/24 实现，确保DNS指向10.0.0.8
+curl www.example.com
+www.example.com in Beijing 
+
+#DNS客户端2：172.16.0.6/16 实现，确保DNS指向172.16.0.8
+curl www.example.com
+www.example.com in Shanghai
+
+#DNS客户端3：10.0.0.8 实现，，确保DNS指向127.0.0.1
+curl www.example.com
+www.example.com in Other
+```
+## dns排错
+dns服务常见故障
+ - SERVFAIL：The nameserver encountered a problem while processing the query.
+   - 可使用dig +trace排错，可能是网络和防火墙导致
+ - NXDOMAIN：The queried name does not exist in the zone.
+   - 可能是CNAME对应的A记录不存在导致
+ - REFUSED：The nameserver refused the client's DNS request due to policy restrictions
+   - 可能是DNS策略导致
