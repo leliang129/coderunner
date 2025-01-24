@@ -1,6 +1,6 @@
 ---
 title: DNS域名解析介绍
-sidebar_position: 5
+sidebar_position: 6
 ---
 
 ## DNS 域名系统简介
