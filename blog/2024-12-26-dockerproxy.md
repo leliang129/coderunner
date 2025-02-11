@@ -10,25 +10,20 @@ mkdir -p /etc/systemd/system/docker.service.d
 vim /etc/systemd/system/docker.service.d/http-proxy.conf
 
 [Service]
-Environment="HTTP_PROXY=http://192.168.91.1:7890"
-Environment="HTTPS_PROXY=http://192.168.91.1:7890"
-Environment="NO_PROXY=localhost,127.0.0.1,192.168.91.1,example.com"
+Environment="HTTP_PROXY=http://192.168.91.222:7890"
+Environment="HTTPS_PROXY=http://192.168.91.222:7890"
+Environment="NO_PROXY=localhost,127.0.0.0/8,svc,.cluster.local,192.168.0.0/16,10.96.0.0/16"
 
 ```
 ## containerd代理配置
-> 在容器运行时需要代理上网，则配置~/.docker/config.json
+> 在容器运行时需要代理上网，则配置
 ```shell
-{
- "proxies":
- {
-   "default":
-   {
-     "httpProxy": "http://192.168.91.1:7890",
-     "httpsProxy": "http://192.168.91.1:7890",
-     "noProxy": "localhost,127.0.0.1,.example.com"
-   }
- }
-}
+cat /etc/systemd/system/containerd.service.d/http-proxy.conf
+
+[Service]
+Environment="HTTP_PROXY=http://192.168.91.222:7890"
+Environment="HTTPS_PROXY=http://192.168.91.222:7890"
+Environment="NO_PROXY=localhost,127.0.0.0/8,svc,.cluster.local,192.168.0.0/16,10.96.0.0/16"
 ```
 :::info
 仅支持Docker 17.07及以上版本
